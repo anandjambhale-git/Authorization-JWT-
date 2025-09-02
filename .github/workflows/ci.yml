@@ -3,7 +3,7 @@ name: Compile Check
 on:
   pull_request:   # Run on every new PR
     branches:
-      - main      # or your default branch
+      - master      # or your default branch
 
 jobs:
   compile:
