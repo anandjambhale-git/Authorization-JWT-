@@ -17,7 +17,7 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     public AuthService(UserRepository userRepository, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
+        this.userRepository = userRepository
         this.jwtUtil = jwtUtil;
     }
 
