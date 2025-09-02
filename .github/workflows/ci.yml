@@ -1,0 +1,26 @@
+name: Compile Check
+
+on:
+  pull_request:   # Run on every new PR
+    branches:
+      - main      # or your default branch
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'   # change to 17/11 if your Gradle project needs it
+          distribution: 'temurin'
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
+
+      - name: Compile with Gradle
+        run: ./gradlew build -x test
