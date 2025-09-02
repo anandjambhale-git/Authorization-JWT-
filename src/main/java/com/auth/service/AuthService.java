@@ -59,8 +59,15 @@ public class AuthService {
                 .build();
     }
 
-    public Optional<String> validateToken(String token) {
-        // In a real application, you might want to invalidate the token or manage a token blacklist.
+    public Optional<String> validateToken(String header) {
+        String token = extractBearerToken(header);
         return Optional.ofNullable(jwtUtil.validateToken(token));
+    }
+
+    public static String extractBearerToken(String header) {
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return header;
     }
 }

@@ -38,17 +38,14 @@ public class AuthController {
     }
 
     @PostMapping("/validateToken")
-    public ResponseEntity<LoginResponse> checkToken(@RequestHeader(name = "authorization") String token) {
-        Optional<String> validateToken = authService.validateToken(token);
-        if (validateToken.isPresent()) {
-            return ResponseEntity.ok(LoginResponse.builder()
-                    .message("Token is valid")
-                    .token(token)
-                    .build());
-        }else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse.builder()
+    public ResponseEntity<LoginResponse> checkToken(@RequestHeader(name = "authorization") String header) {
+        Optional<String> validateToken = authService.validateToken(header);
+        return validateToken.map(s -> ResponseEntity.ok(LoginResponse.builder()
+                    .message("Authenticated as " + s)
+                    .token(header)
+                    .build()))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse.builder()
                     .message("Token is invalid or expired")
-                    .build());
-        }
+                    .build()));
     }
 }
