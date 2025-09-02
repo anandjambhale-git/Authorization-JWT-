@@ -8,6 +8,8 @@ import com.auth.util.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthService {
     private final UserRepository userRepository;
@@ -43,7 +45,7 @@ public class AuthService {
                     .build();
         }
 
-        String token = jwtUtil.generateToken(userEntity.getUsername());
+        String token = "Bearer " + jwtUtil.generateToken(userEntity.getUsername());
         return LoginResponse.builder()
                 .message("Login successful")
                 .token(token)
@@ -55,5 +57,10 @@ public class AuthService {
         return LoginResponse.builder()
                 .message("User logged out successfully")
                 .build();
+    }
+
+    public Optional<String> validateToken(String token) {
+        // In a real application, you might want to invalidate the token or manage a token blacklist.
+        return Optional.ofNullable(jwtUtil.validateToken(token));
     }
 }

@@ -3,10 +3,11 @@ package com.auth.contoller;
 import com.auth.dto.LoginRequest;
 import com.auth.dto.LoginResponse;
 import com.auth.service.AuthService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,8 +19,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        LoginResponse response = authService.login(loginRequest);
+        if (response.getToken() == null) {
+            return ResponseEntity.status(401).body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signup")
@@ -30,5 +35,20 @@ public class AuthController {
     @PostMapping("/logout")
     public LoginResponse logout(String username) {
         return authService.logout(username);
+    }
+
+    @PostMapping("/validateToken")
+    public ResponseEntity<LoginResponse> checkToken(@RequestHeader(name = "authorization") String token) {
+        Optional<String> validateToken = authService.validateToken(token);
+        if (validateToken.isPresent()) {
+            return ResponseEntity.ok(LoginResponse.builder()
+                    .message("Token is valid")
+                    .token(token)
+                    .build());
+        }else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse.builder()
+                    .message("Token is invalid or expired")
+                    .build());
+        }
     }
 }

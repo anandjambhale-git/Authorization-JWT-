@@ -22,14 +22,28 @@ public class JwtUtil {
         this.expiryMillis = expiryMinutes * 60* 1000;
     }
 
-    public String generateToken(String usename) {
+    public String generateToken(String username) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
-                .setSubject(usename)
+                .setSubject(username)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expiryMillis))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String validateToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            // Token is invalid or expired
+            return null;
+        }
     }
 }
